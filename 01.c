@@ -1,16 +1,15 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 
 int main()
 {   double **resist, **volt;
-    int n,gn;
+    int n;
 
     printf("Enter the total number of nodes (Including ground node): ");
     scanf("%d",&n);
     
    
-    int choice;
+  
 
     resist = (double **) malloc(n * sizeof(double *));
     volt   = (double **) malloc(n * sizeof(double *));
@@ -23,15 +22,19 @@ int main()
     }
 
     int i,j;
-
+    int choice=0;
+    char input[50];
     do
     { 
         printf("Select:  \n"); //select Which component to input value for: 
-        printf("1. Resistance \n2. Battery\n3. Exit");
-        scanf("%d",&choice);
-
-        switch(choice)
-        {
+        printf("1. Resistance \n2. Battery\n3. Exit\n");
+        printf("Enter choice: ");
+        scanf("%s",input);
+        if(input[1] == '\0' && input[0] >= '1' && input[0] <= '3')
+       {
+            choice = input[0] - '0';
+            switch(choice)
+         {
             case 1:
             {
                 for(i=0; i<n; i++)
@@ -63,12 +66,24 @@ int main()
             }
             case 3:
             {
-                printf("Exiting...");
+                printf("Exiting...\n");
+                break;
+            }
+            default:
+            {
+                printf("Enter a valid choice!\n");
                 break;
             }
         }
+       
+    }
+    else
+    {
+        printf("Enter a valid choice!\n");
+        choice = 0;
+    }
 }while(choice!=3);
-    
+   
 
 
     return 0;
