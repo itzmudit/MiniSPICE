@@ -58,7 +58,7 @@ int main()
                     {
                         printf("Enter the value of voltage between Node %d and Node %d :",i,j);
                         scanf("%lf",&volt[i][j]);
-                        volt[j][i] = volt[i][j];
+                        volt[j][i] = -volt[i][j];
                     }
                 }
 
