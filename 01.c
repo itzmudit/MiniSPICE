@@ -86,11 +86,16 @@ do
                 {
                     for(j=i+1; j<nodes; j++)
                     {
+                        retry_resistor:
                         printf("Enter the value of resistor between Node %d and Node %d : ",i,j);   
                         scanf("%lf",&resist[i][j]);
                         // TODO: clearBuffer() yahan
                         // TODO: scanf fail ho ya value negative ho to dobara poocho
                         resist[j][i] = resist[i][j];
+                        if(resist[i][j]<0)
+                        {
+                            printf("Please enter a positive value for resisitance:\n");
+                            goto retry_resistor;
                     }
                 }
                 break;
