@@ -99,6 +99,7 @@ do
             {
                 printf("Negative (-) terminal of battery is connected to ground (Node 0).\n");
                 printf("Enter + terminal node (1 to %d): ", nodes - 1);
+                posNode=0;
                 scanf("%d", &posNode);
                 // TODO: clearBuffer() yahan
                 while(posNode<1||posNode>nodes-1)
@@ -121,7 +122,6 @@ do
                 //   - Gaussian elimination (alag function mein)
                 //   - node voltages, current, power print karo
                 //   - results.txt mein save karo
-                // FIX: end mein break lagao, abhi ye seedha case 4 mein gir jaata hai
                 break;
             }
             case 4:
@@ -139,7 +139,7 @@ do
     }
 }while(choice!=4);
 
-for(int l=0;l<i;l++)
+for(int l=0;l<nodes;l++)
 {
     free(resist[l]);
 }
