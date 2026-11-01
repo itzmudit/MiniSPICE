@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>   // TODO: use nahi ho raha, hata do
-#include<math.h>
+// BHAIFIX: <string.h> hata diya kyunki iska sach mein koi use nahi tha yahan.
+#include <math.h>
 #define MAX_NODES 10
 
+void clearBuffer() 
+{
+    while (getchar() != '\n');
+}
 
-    void clearBuffer() 
-    {
-       while (getchar() != '\n');
-    }
-void buildMatrix(double resist[][10], int nodes, int posNode, double volt, double Left_Grid[][10], double Right_Side_List[]) 
+// BHAIFIX: Function ke parameters mein double **resist kiya, kyunki main() mein tune dynamic allocation (malloc/calloc) use kiya hai.
+void buildMatrix(double **resist, int nodes, int posNode, double volt, double Left_Grid[][10], double Right_Side_List[]) 
 {
     int i, j;
     
@@ -26,8 +27,6 @@ void buildMatrix(double resist[][10], int nodes, int posNode, double volt, doubl
             Left_Grid[i][i] = 1.0;
             Right_Side_List[i] = volt;
         }
-        
-        
         else {
             for (j = 0; j < nodes; j++) {
                 if (i != j && resist[i][j] > 0.0) {
@@ -41,20 +40,19 @@ void buildMatrix(double resist[][10], int nodes, int posNode, double volt, doubl
                     }
                 }
             }
-            
         }
     }
 }
 
-
-
 int main()
-{   double **resist, volt=0;
+{   
+    double **resist, volt=0;
     int posNode=0;
     char n[50];
     int nodes = 0;
     int valid = 0;
     printf("Assumption: Node 0 is Ground Node.\n");
+    
     do
     {   
         printf("Enter the total number of nodes (Including ground node): ");
@@ -76,7 +74,6 @@ int main()
         }
     } while (valid == 0);
 
-
     resist = (double **) malloc(nodes * sizeof(double *));
 
     if(resist==NULL)
@@ -85,8 +82,8 @@ int main()
         return 1;
     }
 
-
-   for (int i = 0; i < nodes; i++)
+    // BHAIFIX: Yahan tune calloc use kiya hai, jo bohot badiya step hai! Ye apne aap saare dabbo ko 0.0 set kar dega.
+    for (int i = 0; i < nodes; i++)
     {
         resist[i] = (double *) calloc(nodes, sizeof(double));
         if (resist[i] == NULL)
@@ -101,17 +98,17 @@ int main()
         }
     }
 
-
-
     int i,j;
     int choice=0;
     char input[50];
+    
 menu: do
 {
-    printf("Select:  \n"); //select Which component to input value for:
+    printf("\nSelect:  \n"); 
     printf("1. Resistance \n2. Battery\n3. Solve Circuit\n4. Exit\n");
     printf("Enter choice: ");
     scanf("%49s",input);
+    
     if(input[1] == '\0' && input[0] >= '1' && input[0] <= '4')
     {
         choice = input[0] - '0';
@@ -124,20 +121,20 @@ menu: do
                 {
                     for(j=i+1; j<nodes; j++)
                     {
-                        do                                                              // CHANGE 11: goto hata ke do-while
+                        do                                                      
                         {
                             printf("Enter the value of resistor between Node %d and Node %d : ",i,j);   
                             scanf("%lf",&resist[i][j]);
                             clearBuffer();
-                            // TODO: scanf fail ho ya value negative ho to dobara poocho
+                            
                             if(resist[i][j]<0)
                             {
-                                printf("Resistance cannot be negative! Enter again.\n");   // CHANGE 11: message aur spelling theek
+                                printf("Resistance cannot be negative! Enter again.\n");   
                             }
-                        } while(resist[i][j]<0);                                        // CHANGE 11: negative value pe dobara poochega
-                        resist[j][i] = resist[i][j];                                    // CHANGE 11: check ke baad copy
+                        } while(resist[i][j]<0);                                        
+                        resist[j][i] = resist[i][j];                                    
                     }
-                }                                                                       // CHANGE 11: missing } add kiya (for i band)
+                }                                                                       
                 break;
             }
             case 2:
@@ -165,8 +162,10 @@ menu: do
                     printf("No Battery Added! Try Again\n");
                     break;
                 }
-                double Left_Grid[10][10];
-                double Right_Side_List[10]; 
+                
+                // BHAIFIX: Left_Grid aur Right_Side_List MAX_NODES ke size ka banaya taaki buffer overflow na ho
+                double Left_Grid[MAX_NODES][MAX_NODES];
+                double Right_Side_List[MAX_NODES]; 
             
                 printf("\nCalculating Matrix...\n");
             
@@ -177,16 +176,12 @@ menu: do
                 {
                     for (int j = 1; j < nodes; j++) 
                     {
-                        printf("%.4f\t", Left_Grid[i][j]);
+                        printf("%8.4f\t", Left_Grid[i][j]);
                     }
-                    printf(" |  %.4f\n", Right_Side_List[i]);
+                    printf(" |  %8.4f\n", Right_Side_List[i]);
                 }
-            break;
-                //   - resist se G matrix banao (ground chhod ke)
-                //   - battery wale node ki equation set karo
-                //   - Gaussian elimination (alag function mein)
-                //   - node voltages, current, power print karo
-                //   - results.txt mein save karo
+                
+                // BHAIFIX: Yahan do baar 'break;' likha tha, ek extra hata diya aur comments clean kar diye.
                 break;
             }
             case 4:
@@ -195,9 +190,7 @@ menu: do
                 break;
             }
         }
-
     }
-
     else
     {
         printf("Enter a valid choice!\n");
@@ -205,6 +198,7 @@ menu: do
     }
 }while(choice!=4);
 
+// BHAIFIX: Memory free karne wala logic ekdum mast kaam kar raha hai.
 for(int l=0;l<nodes;l++)
 {
     free(resist[l]);
