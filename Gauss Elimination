@@ -57,3 +57,64 @@ Aise hi karte karte wo Eq 1 par pahuchega aur V1 nikal lega.
 Kyunki code ke andar hum EXACTLY yahi pattern banayenge. Ek bahar wala `for` loop hoga jo "Boss" chunega (Round 1, 2, 3), aur ek andar wala loop hoga jo us boss ke neeche wali saari rows mein jaa kar factor multiply karke minus karega.
 
 Bata, ye "Boss" aur "Seedhi" (Staircase) wala pattern samajh aaya 4 equations ke liye?
+
+--------------------------------------------------------------------------------------------------------------------
+
+// Ye function matrix ko solve karke saare node voltages V[] array mein daal dega
+void solveGaussian(double Left_Grid[][MAX_NODES], double Right_Side_List[], double V[], int nodes) 
+{
+    int i, j, k;
+    
+    // STEP 1: Forward Elimination (Neeche zero banana)
+    for (k = 1; k < nodes - 1; k++) 
+    {
+        for (i = k + 1; i < nodes; i++) 
+        {
+            // Factor nikal rahe hain jisse multiply karke minus karenge
+            double factor = Left_Grid[i][k] / Left_Grid[k][k];
+            
+            for (j = k; j < nodes; j++) 
+            {
+                Left_Grid[i][j] = Left_Grid[i][j] - (factor * Left_Grid[k][j]);
+            }
+            // Right side list mein bhi wahi factor minus karna zaroori hai
+            Right_Side_List[i] = Right_Side_List[i] - (factor * Right_Side_List[k]);
+        }
+    }
+
+    // STEP 2: Back Substitution (Neeche se upar voltages nikalna)
+    for (i = nodes - 1; i >= 1; i--) 
+    {
+        V[i] = Right_Side_List[i]; // Pehle right side ka number liya
+        
+        for (j = i + 1; j < nodes; j++) 
+        {
+            V[i] = V[i] - (Left_Grid[i][j] * V[j]); // Jo voltage nikal gaye hain unko minus kiya
+        }
+        
+        V[i] = V[i] / Left_Grid[i][i]; // Bachi hui value ko uske variable ke number se divide kar diya
+    }
+    
+    // Node 0 Ground hai, toh uska voltage hamesha 0 rahega
+    V[0] = 0.0;
+}
+----------------------------------------------------------------------------------
+
+// ... (tera pichla code jahan matrix print ho rahi thi) ...
+            
+            // 1. Ek naya array banayenge jisme saare Final Voltages store honge
+            double V[MAX_NODES] = {0.0}; 
+            
+            // 2. Apne Gaussian function ko bulao aur matrix solve karwao
+            solveGaussian(Left_Grid, Right_Side_List, V, nodes);
+            
+            // 3. Screen par final result print karo!
+            printf("\n--- FINAL NODE VOLTAGES ---\n");
+            printf("Node 0 (Ground) = 0.0000 V\n");
+            for (int k = 1; k < nodes; k++) 
+            {
+                printf("Node %d Voltage  = %.4f V\n", k, V[k]);
+            }
+            printf("---------------------------\n\n");
+            
+            break; // Case 3 yahan khatam
