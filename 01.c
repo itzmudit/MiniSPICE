@@ -3,7 +3,7 @@
 #include <string.h>   // TODO: use nahi ho raha, hata do
 #include<math.h>
 
-    void clearBuffer() // CHANGE 1: naya function
+    void clearBuffer() 
     {
        while (getchar() != '\n');
     }
@@ -68,7 +68,7 @@ int main()
     int i,j;
     int choice=0;
     char input[50];
-do
+menu: do
 {
     printf("Select:  \n"); //select Which component to input value for:
     printf("1. Resistance \n2. Battery\n3. Solve Circuit\n4. Exit\n");
@@ -90,15 +90,16 @@ do
                         {
                             printf("Enter the value of resistor between Node %d and Node %d : ",i,j);   
                             scanf("%lf",&resist[i][j]);
-                            // TODO: clearBuffer() yahan
+                            clearBuffer();
+                            // TODO: scanf fail ho ya value negative ho to dobara poocho
                             if(resist[i][j]<0)
                             {
-                                printf("Resistance cannot be negative! Enter again.\n");   
+                                printf("Resistance cannot be negative! Enter again.\n");   // CHANGE 11: message aur spelling theek
                             }
-                        } while(resist[i][j]<0);                                        
-                        resist[j][i] = resist[i][j];                                    
+                        } while(resist[i][j]<0);                                        // CHANGE 11: negative value pe dobara poochega
+                        resist[j][i] = resist[i][j];                                    // CHANGE 11: check ke baad copy
                     }
-                }                                                                       
+                }                                                                       // CHANGE 11: missing } add kiya (for i band)
                 break;
             }
             case 2:
@@ -107,22 +108,25 @@ do
                 printf("Enter + terminal node (1 to %d): ", nodes - 1);
                 posNode=0;
                 scanf("%d", &posNode);
-                // TODO: clearBuffer() yahan
+                clearBuffer();
                 while(posNode<1||posNode>nodes-1)
                 {
                     printf("Invalid Node! Enter again (1 to %d): ",nodes-1);
                     scanf("%d",&posNode);
-                    // TODO: clearBuffer() yahan (iske bina "abc" daalne pe infinite loop)
+                    clearBuffer();
                 } 
                 printf("Enter battery voltage (V): ");
                 scanf("%lf",&volt);
-                // TODO: clearBuffer() yahan
+                clearBuffer();
                 break;
             }
             case 3:
-            {
-                // TODO: Solve ka code yahan aayega:
-                //   - check: battery daali hai (posNode != 0), koi node floating nahi
+            {   
+                if(posNode==0)
+                {
+                    printf("No Battery Added! Try Again\n");
+                    break;
+                }
                 //   - resist se G matrix banao (ground chhod ke)
                 //   - battery wale node ki equation set karo
                 //   - Gaussian elimination (alag function mein)
