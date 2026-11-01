@@ -1,145 +1,7 @@
-Bilkul sahi point pakda! 2 equations mein toh hum dimaag me hi calculate kar lete hain, par asli algorithm ka magic tab dikhta hai jab 4 ya usse zyada equations aati hain.
-
-Maan le tere paas 4 nodes hain, toh teri 4 equations kuch aisi dikhengi (main numbers ki jagah `X` likh raha hoon taaki pattern samajh aaye):
-
-Eq 1: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
-Eq 2: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
-Eq 3: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
-Eq 4: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
-
-Computer isko ek sath solve nahi kar sakta. Wo isko "Step-by-Step" ek **Seedhi (Staircase)** mein convert karta hai. Dekh kaise:
-
-### STEP 1: Forward Elimination (Zero ki Seedhi banana)
-
-Computer har round mein ek equation ko "Boss" (Pivot) banata hai aur uske neeche walo ko kaat-ta hai.
-
-**Round 1 (Boss = Eq 1): Target hai sabme se V1 hatana**
-Computer Eq 1 ko use karke Eq 2, Eq 3, aur Eq 4 par "multiply karke minus" wala operation chalata hai.
-Is round ke baad matrix aisi dikhegi:
-Eq 1: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (Boss same rahi)
-Eq 2: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V1 zero ho gaya)
-Eq 3: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V1 zero ho gaya)
-Eq 4: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V1 zero ho gaya)
-
-**Round 2 (Boss = Eq 2): Target hai neeche walo me se V2 hatana**
-Ab Eq 1 ka kaam khatam. Ab Eq 2 Boss banegi, aur wo apne se sirf NEECHE wali equations (Eq 3 aur Eq 4) par attack karegi taaki unka V2 kat jaye.
-Is round ke baad:
-Eq 1: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
-Eq 2: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (Boss)
-Eq 3: `[ 0 ]` V1 + `[ 0 ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V2 bhi gaya)
-Eq 4: `[ 0 ]` V1 + `[ 0 ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V2 bhi gaya)
-
-**Round 3 (Boss = Eq 3): Target hai aakhiri me se V3 hatana**
-Ab Eq 3 Boss banegi aur Eq 4 par attack karegi taaki uska V3 kat jaye.
-Final result dekh:
-Eq 1: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
-Eq 2: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
-Eq 3: `[ 0 ]` V1 + `[ 0 ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
-Eq 4: `[ 0 ]` V1 + `[ 0 ]` V2 + `[ 0 ]` V3 + `[ X ]` V4 = `[ X ]`
-
-Ye jo 0 ka triangle (seedhi) ban gaya na, yahi computer ka goal tha!
-
-### STEP 2: Back Substitution (Upar chadhte hue solve karna)
-
-Ab dekh, computer ko aakhiri (Eq 4) me kya dikh raha hai?
-Sirf: `[ X ] * V4 = [ X ]`
-Baaki sab toh 0 ho chuka hai! Toh computer turant divide karke V4 ki value nikal lega.
-
-Ab wo ek seedhi upar chadhega (Eq 3 par):
-Eq 3 mein do variable bache the (V3 aur V4). Kyunki V4 hume mil chuka hai, wo V4 ki value daalega, aur wahan se V3 nikal lega.
-
-Fir ek seedhi aur upar (Eq 2 par):
-Yahan V2, V3, aur V4 the. V3 aur V4 pata chal chuke hain, unko daalega aur V2 nikal lega.
-
-Aise hi karte karte wo Eq 1 par pahuchega aur V1 nikal lega.
-
-**Logic clear hua?**
-Kyunki code ke andar hum EXACTLY yahi pattern banayenge. Ek bahar wala `for` loop hoga jo "Boss" chunega (Round 1, 2, 3), aur ek andar wala loop hoga jo us boss ke neeche wali saari rows mein jaa kar factor multiply karke minus karega.
-
-Bata, ye "Boss" aur "Seedhi" (Staircase) wala pattern samajh aaya 4 equations ke liye?
-
---------------------------------------------------------------------------------------------------------------------
-
-// Ye function matrix ko solve karke saare node voltages V[] array mein daal dega
-void solveGaussian(double Left_Grid[][MAX_NODES], double Right_Side_List[], double V[], int nodes) 
-{
-    int i, j, k;
-    
-    // STEP 1: Forward Elimination (Neeche zero banana)
-    for (k = 1; k < nodes - 1; k++) 
-    {
-        for (i = k + 1; i < nodes; i++) 
-        {
-            // Factor nikal rahe hain jisse multiply karke minus karenge
-            double factor = Left_Grid[i][k] / Left_Grid[k][k];
-            
-            for (j = k; j < nodes; j++) 
-            {
-                Left_Grid[i][j] = Left_Grid[i][j] - (factor * Left_Grid[k][j]);
-            }
-            // Right side list mein bhi wahi factor minus karna zaroori hai
-            Right_Side_List[i] = Right_Side_List[i] - (factor * Right_Side_List[k]);
-        }
-    }
-
-    // STEP 2: Back Substitution (Neeche se upar voltages nikalna)
-    for (i = nodes - 1; i >= 1; i--) 
-    {
-        V[i] = Right_Side_List[i]; // Pehle right side ka number liya
-        
-        for (j = i + 1; j < nodes; j++) 
-        {
-            V[i] = V[i] - (Left_Grid[i][j] * V[j]); // Jo voltage nikal gaye hain unko minus kiya
-        }
-        
-        V[i] = V[i] / Left_Grid[i][i]; // Bachi hui value ko uske variable ke number se divide kar diya
-    }
-    
-    // Node 0 Ground hai, toh uska voltage hamesha 0 rahega
-    V[0] = 0.0;
-}
-----------------------------------------------------------------------------------
-
-// ... (tera pichla code jahan matrix print ho rahi thi) ...
-            
-            // 1. Ek naya array banayenge jisme saare Final Voltages store honge
-            double V[MAX_NODES] = {0.0}; 
-            
-            // 2. Apne Gaussian function ko bulao aur matrix solve karwao
-            solveGaussian(Left_Grid, Right_Side_List, V, nodes);
-            
-            // 3. Screen par final result print karo!
-            printf("\n--- FINAL NODE VOLTAGES ---\n");
-            printf("Node 0 (Ground) = 0.0000 V\n");
-            for (int k = 1; k < nodes; k++) 
-            {
-                printf("Node %d Voltage  = %.4f V\n", k, V[k]);
-            }
-            printf("---------------------------\n\n");
-            
-            break; // Case 3 yahan khatam
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
+#include<string.h>
 #include <math.h>
-
 #define MAX_NODES 10
 
 void clearBuffer() 
@@ -147,12 +9,11 @@ void clearBuffer()
     while (getchar() != '\n');
 }
 
-// Ye function circuit padh kar saari equations (Matrix) banata hai
-void buildMatrix(double **resist, int nodes, int posNode, double volt, double Left_Grid[][MAX_NODES], double Right_Side_List[]) 
+// BHAIFIX: Function ke parameters mein double **resist kiya, kyunki main() mein tune dynamic allocation (malloc/calloc) use kiya hai.
+void buildMatrix(double **resist, int nodes, int posNode, double volt, double Left_Grid[][10], double Right_Side_List[]) 
 {
     int i, j;
     
-    // Safai (Zero karna)
     for (i = 1; i < nodes; i++) {
         Right_Side_List[i] = 0.0;
         for (j = 1; j < nodes; j++) {
@@ -160,8 +21,8 @@ void buildMatrix(double **resist, int nodes, int posNode, double volt, double Le
         }
     }
     
-    // Asli logic (Battery aur KCL)
     for (i = 1; i < nodes; i++) {
+        
         if (i == posNode) {
             Left_Grid[i][i] = 1.0;
             Right_Side_List[i] = volt;
@@ -169,8 +30,11 @@ void buildMatrix(double **resist, int nodes, int posNode, double volt, double Le
         else {
             for (j = 0; j < nodes; j++) {
                 if (i != j && resist[i][j] > 0.0) {
+                    
                     double g_val = 1.0 / resist[i][j]; 
+                    
                     Left_Grid[i][i] = Left_Grid[i][i] + g_val;
+                    
                     if (j != 0) { 
                         Left_Grid[i][j] = Left_Grid[i][j] - g_val;
                     }
@@ -180,46 +44,40 @@ void buildMatrix(double **resist, int nodes, int posNode, double volt, double Le
     }
 }
 
-// Ye naya function matrix solve karke voltages nikalega
-void solveGaussian(double Left_Grid[][MAX_NODES], double Right_Side_List[], double V[], int nodes) 
+void solveGaussian(double G_LHS[][MAX_NODES],double V[], double RHS[],int NoDe)
 {
-    int i, j, k;
-    
-    // STEP 1: Forward Elimination (Neeche zero banana)
-    for (k = 1; k < nodes - 1; k++) 
+    // STEP 1: Forward Eliminatio
+    int a,b,c;
+    for(a=1;a<NoDe-1;a++ )
     {
-        for (i = k + 1; i < nodes; i++) 
+        for(b=a+1;b<NoDe;b++)
         {
-            // Taki zero se divide ka error na aaye
-            if (Left_Grid[k][k] == 0.0) continue; 
-            
-            double factor = Left_Grid[i][k] / Left_Grid[k][k];
-            
-            for (j = k; j < nodes; j++) 
+            if(G_LHS[a][a]==0.0)
             {
-                Left_Grid[i][j] = Left_Grid[i][j] - (factor * Left_Grid[k][j]);
+                continue;
             }
-            Right_Side_List[i] = Right_Side_List[i] - (factor * Right_Side_List[k]);
-        }
-    }
+            double factor=G_LHS[b][a]/G_LHS[a][a];
+            for(c=a;c<NoDe;c++)
+            {
+                G_LHS[b][c]=G_LHS[b][c]-factor*G_LHS[a][c];
+            }
+            RHS[b]=RHS[b]-factor*RHS[a];
 
-    // STEP 2: Back Substitution (Neeche se upar values nikalna)
-    for (i = nodes - 1; i >= 1; i--) 
-    {
-        V[i] = Right_Side_List[i];
-        
-        for (j = i + 1; j < nodes; j++) 
-        {
-            V[i] = V[i] - (Left_Grid[i][j] * V[j]);
-        }
-        
-        if (Left_Grid[i][i] != 0.0) {
-            V[i] = V[i] / Left_Grid[i][i];
         }
     }
-    
-    // Node 0 Ground hai
-    V[0] = 0.0;
+    // STEP 2: Back Substitution
+    for(b=NoDe-1;b>=1;b--)
+    {
+        V[b]=RHS[b];
+        for(c=b+1;c<NoDe;c++)
+        {
+            V[b] = V[b] - (G_LHS[b][c] * V[c]);
+        }
+        if(G_LHS[b][b]!=0)
+        {
+            V[b]=V[b]/G_LHS[b][b];
+        }
+    }
 }
 
 int main()
@@ -229,7 +87,6 @@ int main()
     char n[50];
     int nodes = 0;
     int valid = 0;
-    
     printf("Assumption: Node 0 is Ground Node.\n");
     
     do
@@ -254,27 +111,31 @@ int main()
     } while (valid == 0);
 
     resist = (double **) malloc(nodes * sizeof(double *));
-    if(resist == NULL)
+
+    if(resist==NULL)
     {
         printf("Memory allocation Failed.\n");
         return 1;
     }
 
-    // Har resistor initially 0 set karna zaroori hai (infinite se bachne ke liye)
+    // BHAIFIX: Yahan tune calloc use kiya hai, jo bohot badiya step hai! Ye apne aap saare dabbo ko 0.0 set kar dega.
     for (int i = 0; i < nodes; i++)
     {
         resist[i] = (double *) calloc(nodes, sizeof(double));
         if (resist[i] == NULL)
         {
             printf("Memory allocation failed.\n");
-            for(int l = 0; l < i; l++) free(resist[l]);
+            for(int l=0;l<i;l++)
+            {
+                free(resist[l]);
+            }
             free(resist);
             return 1;
         }
     }
 
-    int i, j;
-    int choice = 0;
+    int i,j;
+    int choice=0;
     char input[50];
     
 menu: do
@@ -282,7 +143,7 @@ menu: do
     printf("\nSelect:  \n"); 
     printf("1. Resistance \n2. Battery\n3. Solve Circuit\n4. Exit\n");
     printf("Enter choice: ");
-    scanf("%49s", input);
+    scanf("%49s",input);
     
     if(input[1] == '\0' && input[0] >= '1' && input[0] <= '4')
     {
@@ -292,21 +153,21 @@ menu: do
             case 1:
             {
                 printf("Enter 0 if no resistor is connected.\n");
-                for(i = 0; i < nodes; i++)
+                for(i=0; i<nodes; i++)
                 {
-                    for(j = i + 1; j < nodes; j++)
+                    for(j=i+1; j<nodes; j++)
                     {
                         do                                                      
                         {
-                            printf("Enter the value of resistor between Node %d and Node %d : ", i, j);   
-                            scanf("%lf", &resist[i][j]);
+                            printf("Enter the value of resistor between Node %d and Node %d : ",i,j);   
+                            scanf("%lf",&resist[i][j]);
                             clearBuffer();
                             
-                            if(resist[i][j] < 0)
+                            if(resist[i][j]<0)
                             {
                                 printf("Resistance cannot be negative! Enter again.\n");   
                             }
-                        } while(resist[i][j] < 0);                                        
+                        } while(resist[i][j]<0);                                        
                         resist[j][i] = resist[i][j];                                    
                     }
                 }                                                                       
@@ -316,48 +177,46 @@ menu: do
             {
                 printf("Negative (-) terminal of battery is connected to ground (Node 0).\n");
                 printf("Enter + terminal node (1 to %d): ", nodes - 1);
-                posNode = 0;
+                posNode=0;
                 scanf("%d", &posNode);
                 clearBuffer();
-                while(posNode < 1 || posNode > nodes - 1)
+                while(posNode<1||posNode>nodes-1)
                 {
-                    printf("Invalid Node! Enter again (1 to %d): ", nodes - 1);
-                    scanf("%d", &posNode);
+                    printf("Invalid Node! Enter again (1 to %d): ",nodes-1);
+                    scanf("%d",&posNode);
                     clearBuffer();
                 } 
                 printf("Enter battery voltage (V): ");
-                scanf("%lf", &volt);
+                scanf("%lf",&volt);
                 clearBuffer();
                 break;
             }
             case 3:
             {   
-                if(posNode == 0)
+                if(posNode==0)
                 {
-                    printf("No Battery Added! Please add battery first.\n");
+                    printf("No Battery Added! Try Again\n");
                     break;
                 }
                 
+                
                 double Left_Grid[MAX_NODES][MAX_NODES];
                 double Right_Side_List[MAX_NODES]; 
-                double V[MAX_NODES] = {0.0}; // Naya array final voltages ke liye
             
                 printf("\nCalculating Matrix...\n");
+            
                 buildMatrix(resist, nodes, posNode, volt, Left_Grid, Right_Side_List);
             
-                printf("\nSolving using Gaussian Elimination...\n");
-                solveGaussian(Left_Grid, Right_Side_List, V, nodes);
-                
-                // Final Results Print Karna
-                printf("\n===================================\n");
-                printf("       FINAL NODE VOLTAGES         \n");
-                printf("===================================\n");
-                printf(" Node 0 (Ground) = 0.0000 V\n");
-                for (int k = 1; k < nodes; k++) 
+                printf("Matrix successfully ban gayi hai!\n\n");
+                for (int i = 1; i < nodes; i++) 
                 {
-                    printf(" Node %d Voltage  = %.4f V\n", k, V[k]);
+                    for (int j = 1; j < nodes; j++) 
+                    {
+                        printf("%8.4f\t", Left_Grid[i][j]);
+                    }
+                    printf(" |  %8.4f\n", Right_Side_List[i]);
                 }
-                printf("===================================\n");
+                
                 
                 break;
             }
@@ -373,10 +232,9 @@ menu: do
         printf("Enter a valid choice!\n");
         choice = 0;
     }
-} while(choice != 4);
+}while(choice!=4);
 
-// Safai (Memory free)
-for(int l = 0; l < nodes; l++)
+for(int l=0;l<nodes;l++)
 {
     free(resist[l]);
 }
