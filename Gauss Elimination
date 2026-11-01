@@ -1,0 +1,59 @@
+Bilkul sahi point pakda! 2 equations mein toh hum dimaag me hi calculate kar lete hain, par asli algorithm ka magic tab dikhta hai jab 4 ya usse zyada equations aati hain.
+
+Maan le tere paas 4 nodes hain, toh teri 4 equations kuch aisi dikhengi (main numbers ki jagah `X` likh raha hoon taaki pattern samajh aaye):
+
+Eq 1: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
+Eq 2: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
+Eq 3: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
+Eq 4: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
+
+Computer isko ek sath solve nahi kar sakta. Wo isko "Step-by-Step" ek **Seedhi (Staircase)** mein convert karta hai. Dekh kaise:
+
+### STEP 1: Forward Elimination (Zero ki Seedhi banana)
+
+Computer har round mein ek equation ko "Boss" (Pivot) banata hai aur uske neeche walo ko kaat-ta hai.
+
+**Round 1 (Boss = Eq 1): Target hai sabme se V1 hatana**
+Computer Eq 1 ko use karke Eq 2, Eq 3, aur Eq 4 par "multiply karke minus" wala operation chalata hai.
+Is round ke baad matrix aisi dikhegi:
+Eq 1: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (Boss same rahi)
+Eq 2: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V1 zero ho gaya)
+Eq 3: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V1 zero ho gaya)
+Eq 4: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V1 zero ho gaya)
+
+**Round 2 (Boss = Eq 2): Target hai neeche walo me se V2 hatana**
+Ab Eq 1 ka kaam khatam. Ab Eq 2 Boss banegi, aur wo apne se sirf NEECHE wali equations (Eq 3 aur Eq 4) par attack karegi taaki unka V2 kat jaye.
+Is round ke baad:
+Eq 1: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
+Eq 2: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (Boss)
+Eq 3: `[ 0 ]` V1 + `[ 0 ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V2 bhi gaya)
+Eq 4: `[ 0 ]` V1 + `[ 0 ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]` (V2 bhi gaya)
+
+**Round 3 (Boss = Eq 3): Target hai aakhiri me se V3 hatana**
+Ab Eq 3 Boss banegi aur Eq 4 par attack karegi taaki uska V3 kat jaye.
+Final result dekh:
+Eq 1: `[ X ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
+Eq 2: `[ 0 ]` V1 + `[ X ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
+Eq 3: `[ 0 ]` V1 + `[ 0 ]` V2 + `[ X ]` V3 + `[ X ]` V4 = `[ X ]`
+Eq 4: `[ 0 ]` V1 + `[ 0 ]` V2 + `[ 0 ]` V3 + `[ X ]` V4 = `[ X ]`
+
+Ye jo 0 ka triangle (seedhi) ban gaya na, yahi computer ka goal tha!
+
+### STEP 2: Back Substitution (Upar chadhte hue solve karna)
+
+Ab dekh, computer ko aakhiri (Eq 4) me kya dikh raha hai?
+Sirf: `[ X ] * V4 = [ X ]`
+Baaki sab toh 0 ho chuka hai! Toh computer turant divide karke V4 ki value nikal lega.
+
+Ab wo ek seedhi upar chadhega (Eq 3 par):
+Eq 3 mein do variable bache the (V3 aur V4). Kyunki V4 hume mil chuka hai, wo V4 ki value daalega, aur wahan se V3 nikal lega.
+
+Fir ek seedhi aur upar (Eq 2 par):
+Yahan V2, V3, aur V4 the. V3 aur V4 pata chal chuke hain, unko daalega aur V2 nikal lega.
+
+Aise hi karte karte wo Eq 1 par pahuchega aur V1 nikal lega.
+
+**Logic clear hua?**
+Kyunki code ke andar hum EXACTLY yahi pattern banayenge. Ek bahar wala `for` loop hoga jo "Boss" chunega (Round 1, 2, 3), aur ek andar wala loop hoga jo us boss ke neeche wali saari rows mein jaa kar factor multiply karke minus karega.
+
+Bata, ye "Boss" aur "Seedhi" (Staircase) wala pattern samajh aaya 4 equations ke liye?
