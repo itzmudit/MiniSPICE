@@ -91,15 +91,14 @@ do
                             printf("Enter the value of resistor between Node %d and Node %d : ",i,j);   
                             scanf("%lf",&resist[i][j]);
                             // TODO: clearBuffer() yahan
-                            // TODO: scanf fail ho ya value negative ho to dobara poocho
                             if(resist[i][j]<0)
                             {
-                                printf("Resistance cannot be negative! Enter again.\n");   // CHANGE 11: message aur spelling theek
+                                printf("Resistance cannot be negative! Enter again.\n");   
                             }
-                        } while(resist[i][j]<0);                                        // CHANGE 11: negative value pe dobara poochega
-                        resist[j][i] = resist[i][j];                                    // CHANGE 11: check ke baad copy
+                        } while(resist[i][j]<0);                                        
+                        resist[j][i] = resist[i][j];                                    
                     }
-                }                                                                       // CHANGE 11: missing } add kiya (for i band)
+                }                                                                       
                 break;
             }
             case 2:
