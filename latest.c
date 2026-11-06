@@ -2,12 +2,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define MAX_NODES 10
-
+#define MAX_COMP 20
 void clearBuffer()
 {
     while (getchar() != '\n')
         ;
 }
+
+
+
+typedef struct
+{
+    int n1;       
+    int n2;       
+    double value; 
+} Resistor;
 
 // resist is double ** because it is allocated with malloc/calloc in main()
 void buildMatrix(double **resist, int nodes, int posNode, double volt, double Left_Grid[][MAX_NODES], double Right_Side_List[])
@@ -160,137 +169,171 @@ int main()
             choice = input[0] - '0';
             switch (choice)
             {
-                case 1:
+            case 1:
+            {
+                printf("Enter 0 if no resistor is connected.\n");
+                for (i = 0; i < nodes; i++)
                 {
-                    printf("Enter 0 if no resistor is connected.\n");
-                    for (i = 0; i < nodes; i++)
+                    for (j = i + 1; j < nodes; j++)
                     {
-                        for (j = i + 1; j < nodes; j++)
-                        {
-                            int more = 0;
-                            double r;
-                            double total_g = 0; // sum of 1/R of all resistors in this pair
+                        int more = 0;
+                        double r;
+                        double total_g = 0; // sum of 1/R of all resistors in this pair
 
+                        do
+                        {
                             do
                             {
-                                do
+                                printf("Enter the value of resistor between Node %d and Node %d : ", i, j);
+                                scanf("%lf", &r);
+                                clearBuffer();
+
+                                if (r < 0)
                                 {
-                                    printf("Enter the value of resistor between Node %d and Node %d : ", i, j);
-                                    scanf("%lf", &r);
-                                    clearBuffer();
-
-                                    if (r < 0)
-                                    {
-                                        printf("Resistance cannot be negative! Enter again.\n");
-                                    }
-                                } while (r < 0);
-
-                                more = 0;
-                                if (r > 0)
-                                {
-                                    total_g = total_g + 1.0 / r; // parallel: conductances add
-
-                                    printf("1. Add another resistor between %d and %d.\n", i, j);
-                                    if (i == nodes - 2 && j == nodes - 1)
-                                    {
-                                        printf("2. Done (all pairs entered).\n");
-                                    }
-                                    else
-                                    {
-                                        printf("2. Add next pair.\n");
-                                    }
-                                    printf("Enter choice: ");
-                                    scanf("%d", &more);
-                                    clearBuffer();
-
-                                    switch (more)
-                                    {
-                                        case 1:
-                                            break;
-                                        case 2:
-                                            more = 0;
-                                            break;
-                                        default:
-                                            printf("Invalid choice, moving to next pair.\n");
-                                            more = 0;
-                                    }
+                                    printf("Resistance cannot be negative! Enter again.\n");
                                 }
-                            } while (more == 1);
+                            } while (r < 0);
 
-                            // store the equivalent resistance (0 means no resistor)
-                            if (total_g > 0)
+                            more = 0;
+                            if (r > 0)
                             {
-                                resist[i][j] = 1.0 / total_g;
+                                total_g = total_g + 1.0 / r; // parallel: conductances add
+                                
+                                printf("1. Add another resistor between %d and %d.\n", i, j);
+                                if (i == nodes - 2 && j == nodes - 1)
+                                {
+                                    printf("2. Done (all pairs entered).\n");
+                                }
+                                else
+                                {
+                                    printf("2. Add next pair.\n");
+                                }
+                                printf("Enter choice: ");
+                                scanf("%d", &more);
+                                clearBuffer();
+
+                                switch (more)
+                                {
+                                case 1:
+                                    break;
+                                case 2:
+                                    more = 0;
+                                    break;
+                                default:
+                                    printf("Invalid choice, moving to next pair.\n");
+                                    more = 0;
+                                }
                             }
-                            else
-                            {
-                                resist[i][j] = 0;
-                            }
-                            resist[j][i] = resist[i][j];
+                        } while (more == 1);
+
+                        // store the equivalent resistance (0 means no resistor)
+                        if (total_g > 0)
+                        {
+                            resist[i][j] = 1.0 / total_g;
                         }
+                        else
+                        {
+                            resist[i][j] = 0;
+                        }
+                        resist[j][i] = resist[i][j];
                     }
-                    break;
                 }
-                case 2:
+                break;
+            }
+            case 2:
+            {
+                printf("Negative (-) terminal of battery is connected to ground (Node 0).\n");
+                printf("Enter + terminal node (1 to %d): ", nodes - 1);
+                posNode = 0;
+                scanf("%d", &posNode);
+                clearBuffer();
+                while (posNode < 1 || posNode > nodes - 1)
                 {
-                    printf("Negative (-) terminal of battery is connected to ground (Node 0).\n");
-                    printf("Enter + terminal node (1 to %d): ", nodes - 1);
-                    posNode = 0;
+                    printf("Invalid Node! Enter again (1 to %d): ", nodes - 1);
                     scanf("%d", &posNode);
                     clearBuffer();
-                    while (posNode < 1 || posNode > nodes - 1)
-                    {
-                        printf("Invalid Node! Enter again (1 to %d): ", nodes - 1);
-                        scanf("%d", &posNode);
-                        clearBuffer();
-                    }
-                    printf("Enter battery voltage (V): ");
-                    scanf("%lf", &volt);
-                    clearBuffer();
+                }
+                printf("Enter battery voltage (V): ");
+                scanf("%lf", &volt);
+                clearBuffer();
+                break;
+            }
+            case 3:
+            {
+                if (posNode == 0)
+                {
+                    printf("No Battery Added! Try Again\n");
                     break;
                 }
-                case 3:
+
+                double Left_Grid[MAX_NODES][MAX_NODES];
+                double Right_Side_List[MAX_NODES];
+                double V[MAX_NODES] = {0.0};
+
+                printf("\nCalculating Matrix...\n");
+
+                buildMatrix(resist, nodes, posNode, volt, Left_Grid, Right_Side_List);
+
+                printf("Matrix built successfully!\n\n");
+                for (i = 1; i < nodes; i++)
                 {
-                    if (posNode == 0)
+                    for (j = 1; j < nodes; j++)
                     {
-                        printf("No Battery Added! Try Again\n");
-                        break;
+                        printf("%8.4f\t", Left_Grid[i][j]);
                     }
+                    printf(" |  %8.4f\n", Right_Side_List[i]);
+                }
 
-                    double Left_Grid[MAX_NODES][MAX_NODES];
-                    double Right_Side_List[MAX_NODES];
-                    double V[MAX_NODES] = {0.0};
+                solveGaussian(Left_Grid, V, Right_Side_List, nodes);
 
-                    printf("\nCalculating Matrix...\n");
+                printf("\nNode Voltages:\n");
+                printf("V0 = 0.0000 V (Ground)\n");
+                for (i = 1; i < nodes; i++)
+                {
+                    printf("V%d = %.4f V\n", i, V[i]);
+                }
 
-                    buildMatrix(resist, nodes, posNode, volt, Left_Grid, Right_Side_List);
+                double RCurrent[MAX_NODES][MAX_NODES];
+                double RPower[MAX_NODES][MAX_NODES];
+                double TPower = 0;
 
-                    printf("Matrix built successfully!\n\n");
-                    for (i = 1; i < nodes; i++)
+                for (int i = 0; i < nodes - 1; i++)
+                {
+                    for (int j = i + i; j < nodes; j++)
                     {
-                        for (j = 1; j < nodes; j++)
+                        if (resist[i][j] > 0)
                         {
-                            printf("%8.4f\t", Left_Grid[i][j]);
+                            RCurrent[i][j] = (V[i] - V[j]) / resist[i][j];
+                            RPower[i][j] = ((V[i] - V[j]) * (V[i] - V[j])) / resist[i][j];
+                            TPower += RPower[i][j];
+                            RCurrent[i][j] = RCurrent[j][i];
+                            RPower[i][j] = RPower[j][i];
                         }
-                        printf(" |  %8.4f\n", Right_Side_List[i]);
+
+                        else if (resist[i][j] = 0)
+                        {
+                        }
                     }
-
-                    solveGaussian(Left_Grid, V, Right_Side_List, nodes);
-
-                    printf("\nNode Voltages:\n");
-                    printf("V0 = 0.0000 V (Ground)\n");
-                    for (i = 1; i < nodes; i++)
-                    {
-                        printf("V%d = %.4f V\n", i, V[i]);
-                    }
-
-                    break;
                 }
-                case 4:
-                {
-                    printf("Exiting...\n");
-                    break;
-                }
+
+                //     Skip if no resistor
+
+                //     Find current using Ohm's law
+
+                //     Find power
+
+                //     Print the result
+
+                //     If this resistor touches the battery node, update battery current
+
+                // Print battery current and battery power
+                break;
+            }
+            case 4:
+            {
+                printf("Exiting...\n");
+                break;
+            }
             }
         }
         else
@@ -299,7 +342,6 @@ int main()
             choice = 0;
         }
     } while (choice != 4);
-
 
     for (int l = 0; l < nodes; l++)
     {
