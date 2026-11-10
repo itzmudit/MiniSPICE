@@ -205,7 +205,6 @@ int main()
             {
             case 1:
             {
-                // ---> CHANGE: Removed "count = 0;" from here so that old components don't get deleted
                 printf("Enter 0 if no resistor is connected.\n");
                 for (i = 0; i < nodes; i++)
                 {
@@ -336,7 +335,7 @@ int main()
                     break;
                 }
 
-                // ---> CHANGE: Started File Handling to save results
+                
                 FILE *fp = fopen("results.txt", "w");
                 
                 printf("\nNode Voltages:\n");
@@ -349,7 +348,6 @@ int main()
                 for (i = 1; i < nodes; i++)
                 {
                     printf("V%d = %.4f V\n", i, V[i]);
-                    // ---> CHANGE: Writing Voltages to File
                     if(fp != NULL) fprintf(fp, "V%d = %.4f V\n", i, V[i]); 
                 }
 
@@ -371,7 +369,7 @@ int main()
 
                     printf("R%d (Node %d - Node %d, %.4f ohm): I = %.4f A, P = %.4f W\n",k + 1, a, b, Rlist[k].value, RCurrent, RPower);
                     
-                    // ---> CHANGE: Writing Current and Power to File
+                    
                     if(fp != NULL) 
                     {
                         fprintf(fp, "R%d (Node %d - Node %d, %.4f ohm): I = %.4f A, P = %.4f W\n",k + 1, a, b, Rlist[k].value, RCurrent, RPower);
@@ -391,7 +389,7 @@ int main()
                 printf("Battery Power   = %.4f W\n", volt * BCurrent);
                 printf("Total Resistor Power = %.4f W\n", TPower);
 
-                // ---> CHANGE: Writing final totals and closing the file
+                
                 if(fp != NULL) 
                 {
                     fprintf(fp, "\nBattery Current = %.4f A\n", BCurrent);
