@@ -3,13 +3,13 @@
 ![C](https://img.shields.io/badge/language-C-5fd4e3?style=flat-square&labelColor=0d1113)
 ![No dependencies](https://img.shields.io/badge/dependencies-none-62c784?style=flat-square&labelColor=0d1113)
 ![SDF Lab-1](https://img.shields.io/badge/JIIT-SDF_Lab--1-ffb547?style=flat-square&labelColor=0d1113)
-[![Live demo](https://img.shields.io/badge/▶_live_demo-itzmudit.vercel.app-ffb547?style=flat-square&labelColor=0d1113)](https://itzmudit.vercel.app/#lab)
+[![Live demo](https://img.shields.io/badge/▶_live_demo-muditjindal.vercel.app-ffb547?style=flat-square&labelColor=0d1113)](https://muditjindal.vercel.app/#lab)
 
 A small DC circuit solver in C. Enter resistors and a voltage source, and it finds every node voltage, plus the current, direction and power of every resistor. It uses nodal analysis and Gaussian elimination.
 
 It's a single C file with no dependencies, and it runs in the terminal.
 
-**Don't want to compile it?** The same algorithm runs in your browser, with a live circuit diagram: **[itzmudit.vercel.app/#lab](https://itzmudit.vercel.app/#lab)**
+**Don't want to compile it?** The same algorithm runs in your browser, with a live circuit diagram: **[muditjindal.vercel.app/#lab](https://muditjindal.vercel.app/#lab)**
 
 ## Features
 
@@ -119,7 +119,7 @@ If a pivot is close to zero (below `1e-12`), some node has no path to ground, an
 
 ## Roadmap
 
-- [x] Browser version with a live circuit diagram ([try it](https://itzmudit.vercel.app/#lab))
+- [x] Browser version with a live circuit diagram ([try it](https://muditjindal.vercel.app/#lab))
 - [ ] Current sources and multiple voltage sources (modified nodal analysis)
 - [ ] Load circuits from a file
 - [ ] AC analysis
