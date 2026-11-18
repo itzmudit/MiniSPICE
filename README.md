@@ -1,8 +1,15 @@
 # MiniSPICE
 
+![C](https://img.shields.io/badge/language-C-5fd4e3?style=flat-square&labelColor=0d1113)
+![No dependencies](https://img.shields.io/badge/dependencies-none-62c784?style=flat-square&labelColor=0d1113)
+![SDF Lab-1](https://img.shields.io/badge/JIIT-SDF_Lab--1-ffb547?style=flat-square&labelColor=0d1113)
+[![Live demo](https://img.shields.io/badge/▶_live_demo-itzmudit.vercel.app-ffb547?style=flat-square&labelColor=0d1113)](https://itzmudit.vercel.app/#lab)
+
 A small DC circuit solver in C. Enter resistors and a voltage source, and it finds every node voltage, plus the current, direction and power of every resistor. It uses nodal analysis and Gaussian elimination.
 
 It's a single C file with no dependencies, and it runs in the terminal.
+
+**Don't want to compile it?** The same algorithm runs in your browser, with a live circuit diagram: **[itzmudit.vercel.app/#lab](https://itzmudit.vercel.app/#lab)**
 
 ## Features
 
@@ -17,17 +24,24 @@ It's a single C file with no dependencies, and it runs in the terminal.
 - Save the report to `results.txt`
 - Strict input: rejects `abc`, `10x`, negative values and out-of-range nodes
 
+## Files
+
+| File | What it is |
+|---|---|
+| `MiniSPICE.c` | The solver |
+| `SDF_Project.c` | The version submitted for SDF Lab-1, with comments explaining every step |
+
 ## Build
 
 ```bash
-gcc minispice.c -o minispice -lm
+gcc MiniSPICE.c -o minispice -lm
 ./minispice
 ```
 
 Windows (MinGW):
 
 ```bash
-gcc minispice.c -o minispice.exe
+gcc MiniSPICE.c -o minispice.exe
 minispice.exe
 ```
 
@@ -105,6 +119,7 @@ If a pivot is close to zero (below `1e-12`), some node has no path to ground, an
 
 ## Roadmap
 
+- [x] Browser version with a live circuit diagram ([try it](https://itzmudit.vercel.app/#lab))
 - [ ] Current sources and multiple voltage sources (modified nodal analysis)
 - [ ] Load circuits from a file
 - [ ] AC analysis
@@ -113,3 +128,5 @@ If a pivot is close to zero (below `1e-12`), some node has no path to ground, an
 ## Contributors
 
 Mudit Jindal · Riyansh Pandey · Aniket Rastogi · Prakhar Mishra
+
+Supervised by Dr. Taj Alam · SDF Lab-1 (24B15CS111), JIIT Noida
